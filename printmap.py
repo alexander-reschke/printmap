@@ -7,18 +7,6 @@ from argparse import RawTextHelpFormatter
 from PIL import Image
 
 
-# TODO
-# * remove y offset when resolution/devisor has a remainder (for example wid = 1700px, divisor = 3, 1700/3=566 (no half-pixels), 566*3=1698 instead of 1700)
-# * save chunks in a temporary folder which gets deleted afterwards
-# * add option to not delete chunks
-# * fix bug occuring between resolution of 8k x 8k (still okay) and 10k x 10k (not downloading everything + very buggy merge)
-# * check out different bing-key to get rid of bing water-mark
-# * -or-
-# * work with y-offsets to hide bing water-mark
-# * add proper requirements.txt
-# * add proper documentation and publish on github
-
-
 # constants
 BASE_URL = 'http://dev.virtualearth.net/REST/v1/Imagery/Map/Aerial'
 
