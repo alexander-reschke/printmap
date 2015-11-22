@@ -109,6 +109,10 @@ def setPictureName():
 
 
 # logical functions
+def checkAuth():
+    return # TODO implement Authentication check
+
+
 def findZoom():
 
     # init some values
@@ -142,8 +146,10 @@ def findZoom():
     # some output and return
     kmWid = (curMeterPerPixel * args.wid) / 1000
     kmHei = (curMeterPerPixel * args.hei) / 1000
-    pInfo('next best fitting radius is %skm (instead of %skm), the area covered is %skm x %skm (%skm²)' % (f((curZoomWidth / 1000) / 2), args.rad, f(kmWid), f(kmHei), f(kmWid * kmHei)))
-    pDebug('the zoom level is %s, picture will display %s meter per pixel' % (zoom, f(curMeterPerPixel)))
+    pInfo('next best fitting radius is %skm (instead of %skm), the area covered is %skm x %skm (%skm²)'
+            % (f((curZoomWidth / 1000) / 2), args.rad, f(kmWid), f(kmHei), f(kmWid * kmHei)))
+    pDebug('the zoom level is %s, picture will display %s meter per pixel'
+            % (zoom, f(curMeterPerPixel)))
     return zoom
 
 
@@ -172,17 +178,22 @@ def getSubCoordinates(centerLat, centerLon, subWid, subHei, zoom, level, targetL
 
             # when target-level is reached and coordinate not already found, add this coordinate to result
             coordinates.add((centerLat, centerLon))
-            pDebug('* recursion end reached for coordinate (%s, %s), found %s / %s coordinates for full picture' % (centerLat, centerLon, len(coordinates), NUM_CHUNKS))
+            pDebug('* recursion end reached for coordinate (%s, %s), found %s / %s coordinates for full picture'
+                    % (centerLat, centerLon, len(coordinates), NUM_CHUNKS))
     else:
 
         # otherwise get coordinates of corners and call getSubCoordinates() on them
         urlData = buildUrl(centerLat, centerLon, subWid, subHei, zoom, True)
         if urlData not in DATA_URLS_CALLED:
             data = processData(urlData)
-            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][2], data['resourceSets'][0]['resources'][0]['bbox'][1], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
-            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][2], data['resourceSets'][0]['resources'][0]['bbox'][3], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
-            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][0], data['resourceSets'][0]['resources'][0]['bbox'][1], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
-            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][0], data['resourceSets'][0]['resources'][0]['bbox'][3], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
+            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][2],
+                    data['resourceSets'][0]['resources'][0]['bbox'][1], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
+            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][2],
+                    data['resourceSets'][0]['resources'][0]['bbox'][3], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
+            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][0],
+                    data['resourceSets'][0]['resources'][0]['bbox'][1], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
+            getSubCoordinates(data['resourceSets'][0]['resources'][0]['bbox'][0],
+                    data['resourceSets'][0]['resources'][0]['bbox'][3], subWid, subHei, zoom, level + 1, targetLevel, coordinates)
             DATA_URLS_CALLED.add(urlData)
 
 
@@ -250,6 +261,7 @@ def main(args):
     # set up everything
     setBingKey()
     setPictureName()
+    checkAuth()
 
     # find out zoom and number of needed sublevels and the according resolution
     zoom = findZoom()
@@ -327,28 +339,35 @@ if __name__ == '__main__':
 HINT: use the --inf option to check if the result suits you or if you want to fiddle with radius or resolution.
 
 Examples:
-> python bmaps_coor.py --rad 1 --wid 2000 --hei 2000 --inf
+> python printmap.py --rad 1 --wid 2000 --hei 2000 --inf
 \tget nothing (info-run), but see informations on what the picture would show
-> python bmaps_coor.py --rad 1 --wid 2000 --hei 2000 -v --name lindow
-\tget above descripted picture, save it as \'lindow.jpg\' and let the program tell you all it is doing
-> python bmaps_coor.py --lat 55.751879 --lon 37.616937 --rad 15 --wid 8000 --hei 6000
+> python printmap.py --rad 1 --wid 2000 --hei 2000 -v --name berlin
+\tget above descripted picture, save it as \'berlin.jpg\' and let the program tell you all it is doing
+> python printmap.py --lat 55.751879 --lon 37.616937 --rad 15 --wid 8000 --hei 6000
 \tget a 8000x6000px picture of moscow with a approx. radius of 15km'''
         , formatter_class=RawTextHelpFormatter)
 
     argp.add_argument('--name', dest='name', help='name of the picture to create; overwrites existing files (default: <timestamp>)')
 
     group = argp.add_mutually_exclusive_group()
-    group.add_argument('--dry', action='store_true', default=False, help='dry run, do not download pictures or modify local data (default false)')
-    group.add_argument('--inf', action='store_true', default=False, help='only show infos for the parameters provided, do not call any external services or modify local data (default false)')
-
+    group.add_argument('--dry', action='store_true', default=False,
+            help='dry run, do not download pictures or modify local data (default false)')
+    group.add_argument('--inf', action='store_true', default=False,
+            help='only show infos for the parameters provided, do not call _any_ external services or modify local data (default false)')
+    
     groupcoor = argp.add_argument_group()
-    groupcoor.add_argument('--lat', type=float, default=52.103570, help='latitude for map center (default 14.301484, range [%s..%s])' % (MIN_LATITUDE, MAX_LATITUDE))
-    groupcoor.add_argument('--lon', type=float, default=14.301484, help='longitude for map center (default 52.103570, range [%s..%s])' % (MIN_LONGITUDE, MAX_LONGITUDE))
-    groupcoor.add_argument('--rad', type=float, default=5, help='estimated radius from center in km (default 5, range [%s..%s])' % (MIN_RADIUS, MAX_RADIUS))
+    groupcoor.add_argument('--lat', type=float, default=52.520852,
+            help='latitude for map center (default 52.520852 (Berlin, Germany), range [%s..%s])' % (MIN_LATITUDE, MAX_LATITUDE))
+    groupcoor.add_argument('--lon', type=float, default= 13.409531,
+            help='longitude for map center (default 13.409531 (Berlin, Germany, range [%s..%s])' % (MIN_LONGITUDE, MAX_LONGITUDE))
+    groupcoor.add_argument('--rad', type=float, default=5,
+            help='estimated radius from center in km (default 5, range [%s..%s])' % (MIN_RADIUS, MAX_RADIUS))
 
     groupres = argp.add_argument_group()
-    groupres.add_argument('--wid', type=int, default=1600, help='resolution in pixel for picture width (default 800, range [%s..%s])' % (MIN_W, MAX_W))
-    groupres.add_argument('--hei', type=int, default=1200, help='resolution in pixel for picture height (default 600, range [%s..%s])' % (MIN_H, MAX_H))
+    groupres.add_argument('--wid', type=int, default=1600,
+            help='resolution in pixel for picture width (default 800, range [%s..%s])' % (MIN_W, MAX_W))
+    groupres.add_argument('--hei', type=int, default=1200,
+            help='resolution in pixel for picture height (default 600, range [%s..%s])' % (MIN_H, MAX_H))
 
     groupoutput = argp.add_mutually_exclusive_group()
     groupoutput.add_argument('-q', '--quiet', action='store_true', default=False, help='show no output (beside errors)')
