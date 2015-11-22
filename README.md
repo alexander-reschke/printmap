@@ -23,12 +23,20 @@ Manual
 ------
 
 Examples:
-* `python printmap.py --rad 1 --wid 2000 --hei 2000 --inf`
-** get nothing (info-run), but see informations on what the picture would show
-* `python printmap.py --rad 1 --wid 2000 --hei 2000 -v --name berlin`
-** get above descripted picture, save it as 'berlin.jpg' and let the program tell you all it is doing
-* `python printmap.py --lat 55.751879 --lon 37.616937 --rad 15 --wid 8000 --hei 6000`
-** get a 8000x6000px picture of moscow with a approx. radius of 15km
+```
+python printmap.py --rad 1 --wid 2000 --hei 2000 --inf
+```
+* get nothing (info-run), but see informations on what the picture would show
+
+```
+python printmap.py --rad 1 --wid 2000 --hei 2000 -v --name berlin
+```
+* get above descripted picture, save it as 'berlin.jpg' and let the program tell you all it is doing
+
+```
+python printmap.py --lat 55.751879 --lon 37.616937 --rad 15 --wid 8000 --hei 6000
+```
+* get a 8000x6000px picture of moscow with a approx. radius of 15km
 
 optional arguments:
 * `-h, --help`     show this help message and exit
@@ -43,3 +51,15 @@ optional arguments:
 * `--rad RAD`      estimated radius from center in km (default 5, range [0.05..2000])
 * `--wid WID`      resolution in pixel for picture width (default 800, range [80..15000])
 * `--hei HEI`      resolution in pixel for picture height (default 600, range [80..15000])
+
+Questions & Answers
+-------------------
+
+Q: What's up with the watermarks?
+A: Well, Bing.
+Q: Can I get rid of them?
+A: Sure. Either by using a non-free license key or, you know, coding.
+
+Q: Any known bugs?
+A: I want to say "No" ...
+
